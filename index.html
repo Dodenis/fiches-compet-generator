@@ -1,0 +1,2211 @@
+<!--
+Pour utiliser le générateur de fiche navette et dossard vous devez télécharger ce fichier sur votre ordinateur 
+et l'ouvrir avec votre navigateur.
+-->
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+        <style id="style-media-page">
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+        </style>
+        <style id="style-base">
+            /* --------------------------------------------------------------- */
+            /* -- Régles css par défaut -------------------------------------- */
+            /* --------------------------------------------------------------- */
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: Ubuntu, Arial, Helvetica, sans-serif;
+                margin: 0 auto;
+                padding: 0;
+                background: rgb(204,204,204);
+                display: flex;
+                flex-direction: column;
+            }
+
+            table {
+                border-spacing: 0;
+                table-layout: fixed;
+                border-collapse:collapse
+            }
+
+            table td {
+                vertical-align:middle;
+            }
+
+            table.nowrap {
+                width: 100%;
+                table-layout: auto !important;
+            }
+
+            table.nowrap td {
+                white-space: nowrap;
+                padding: 0.5mm 1mm;
+            }
+
+            .striped:nth-child(odd) {
+                background-color: #efefef;
+            }
+
+            .bordered {
+                border: solid 1px #000;
+            }
+
+            .cell-head {
+                background-color: #ddd;
+                font-weight: bold;
+            }
+
+            .hidden {
+                display: none !important;
+            }
+
+            .f-special {
+                font-family: "Kanit", sans-serif;
+            }
+
+            .f-bold {
+                font-weight: bold;
+            }
+
+            .f-capital {
+                text-transform: capitalize;
+            }
+
+            .f-upper {
+                text-transform: uppercase;
+            }
+
+            .page {
+                display: inline-flex;
+                flex-wrap: wrap;
+                position: relative;
+                height: 210mm;
+                width: 297mm;
+                font-size: 12pt;
+                margin: 2em auto;
+                padding: 10mm;
+                background: white;
+            }
+
+            .page-a4-portrait {
+                height: 297mm;
+                width: 210mm;
+            }
+
+            .page-a3 {
+                height: 420mm;
+                width: 297mm;
+            }
+
+            .page-no-padding {
+                padding: 0;
+            }
+
+            /* Css pour afficher un bouton Print en haut a droite de manière floatante */
+            .zone-action-btns {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 10000;
+                text-align: right;
+            }
+
+            @media print {
+                .hidden-for-print {
+                    display: none !important;
+                }
+
+                .page {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            }
+
+            @media screen {
+                .page::before {
+                    position: absolute;
+                    content: 'Marge d\'impression 1cm';
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 10mm;
+                    text-align: center;
+                    z-index: 9999;
+                    align-content: center;
+                    font-style: italic;
+                    color: #bbb;
+                }
+                .page::after {
+                    position: absolute;
+                    content: '';
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    box-sizing: border-box;
+                    border: dashed 10mm #eee;
+                    pointer-events: none;
+                    z-index: 999;
+                    border-image: repeating-linear-gradient(45deg, #eeeeee, #eeeeee 5mm, #ffffff 5mm, #ffffff 10mm) 40;
+                }
+            }
+        </style>
+        <style id="style-categ">
+            .u10 .f-color-categ,
+            .u11 .f-color-categ {
+                color: #49ab81;
+            }
+
+            .u12 .f-color-categ,
+            .u13 .f-color-categ {
+                color: #005b96;
+            }
+
+            .u14 .f-color-categ,
+            .u15 .f-color-categ {
+                color: #a32020;
+            }
+
+            .u10 .bg-color-categ,
+            .u11 .bg-color-categ {
+                background-color: #49ab81;
+                color: #fff;
+            }
+
+            .u12 .bg-color-categ,
+            .u13 .bg-color-categ {
+                background-color: #005b96;
+                color: #fff;
+            }
+
+            .u14 .bg-color-categ,
+            .u15 .bg-color-categ {
+                background-color: #a32020;
+                color: #fff;
+            }
+        </style>
+        <style id="style-page-config">
+            /* --------------------------------------------------------------- */
+            /* -- Css de la page de config ----------------------------------- */
+            /* --------------------------------------------------------------- */
+            #page-config {
+                height: auto;
+                width: auto;
+            }
+
+            #page-config .page-config-instruction {
+                padding: 0 10mm 5mm 5mm;
+                border-right: solid 2px #ddd;
+                max-width: 890px;
+            }
+
+            #page-config .page-config-configuration {
+                padding: 0 5mm 5mm 10mm;
+                max-width: 660px;
+            }
+
+            #page-config .form-group {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1em;
+            }
+
+            #page-config .form-group h2 {
+                margin: 0;
+                flex: 1;
+            }
+
+            #page-config .form-group input {
+                flex: 2;
+                padding: 0.5em;
+                font-size: 1em;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            #page-config .config-club-logo {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            #page-config .config-club-logo img {
+                max-width: 180px;
+                max-height: 180px;
+                margin-right: 20px;
+            }
+
+            #page-config .config-sponsor-logo {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            #page-config .sponsor-logo {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                margin-right: 20px;
+                max-height: 80px;
+            }
+
+            #page-config .sponsor-logo > div {
+                position: relative;
+                flex: 1 1 auto;
+                height: 80px;
+                align-content: center;
+            }
+            #page-config .sponsor-logo > div > .del {
+                position:absolute;
+                top: 0;
+                right: 0;
+                width:25px; 
+                height: 25px;
+                border:solid 1px rgb(119, 0, 0);
+                border-radius: 4px;
+                content: 'X';
+                color: #fff;
+                text-align: center;
+                align-items: center;
+                z-index: 9999;
+                background-color: #a32020;
+                display: grid;
+            }
+            #page-config .sponsor-logo > div > .del:hover {
+                background-color: #e62e2e;
+                cursor: pointer;
+            }
+            #page-config .sponsor-logo img {
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            #page-config #upload-zone {
+                display: flex;
+                align-items: flex-start;
+            }
+
+            #page-config #upload-zone input[type=file] {
+                color: #222245;
+                padding: 8px 12px;
+                background-color: #fff;
+                border: 1px solid #222245;
+            }
+
+            #page-config #upload-zone input[type=file]::file-selector-button {
+                cursor: pointer;
+            }
+
+            #page-config #upload-zone input[type=file]::file-selector-button, button {
+                background-image: linear-gradient(92.88deg,#455eb5 9.16%,#5643cc 43.89%,#673fd7 64.72%);
+                border-radius: 8px;
+                border-style: none;
+                box-sizing: border-box;
+                color: #ffffff;
+                cursor: pointer;
+                flex-shrink: 0;
+                font-family: "Inter UI", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                font-size: 16px;
+                font-weight: 500;
+                height: 4rem;
+                padding: 0 1.6rem;
+                text-align: center;
+                text-shadow: rgba(0,0,0,0.25) 0 3px 8px;
+                transition: all .5s;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: manipulation;
+            }
+
+            #page-config #upload-zone input[type=file]::file-selector-button:hover, button:hover {
+                box-shadow: rgba(80,63,205,0.5) 0 1px 30px;
+                transition-duration: .1s;
+            }
+
+            #page-config #upload-zone #file-info {
+                margin-left: 2mm;
+                display: flex;
+            }
+
+            #page-config #upload-zone #file-info button {
+                margin-left: 4mm;
+            }
+
+            #page-config #upload-zone #file-error {
+                margin-left: 2mm;
+                color: red;
+            }
+
+            #page-config #detail-part-in-file {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                list-style: none;
+                padding-left: 10px;
+            }
+
+            #page-config #generate-actions {
+                margin-top: 10mm;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                flex-direction: row;
+                align-items: normal;
+            }
+
+            #page-config #generate-actions > fieldset {
+                flex: 1 1;
+            }
+
+            #page-config #generate-actions #choice-pages-navette {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            #page-config #generate-actions #choice-pages-navette > label {
+                width: 50%;
+                display: block;
+                text-transform: uppercase;
+            }
+        </style>
+        <style id="style-page-navette">
+            /* --------------------------------------------------------------- */
+            /* -- Css des pages de fiche navette ----------------------------- */
+            /* --------------------------------------------------------------- */
+            .page-navette tbody > tr {
+                height: 10mm;
+            }
+
+            .page-navette tbody > tr > td {
+                text-align: center;
+                vertical-align: middle;
+                width: 26mm;
+            }
+
+            .page-navette tbody > tr:nth-child(1) {
+                height: 15mm;
+            }
+
+            .page-navette tbody > tr:nth-child(2) {
+                height: 45mm;
+            }
+
+            .page-navette tbody > tr:nth-child(3) {
+                height: 5mm;
+            }
+            
+            .page-navette .navette-title {
+                font-size: 8mm;
+            }
+
+            .page-navette .sponsor-logo {
+                max-height: 35mm;
+                max-width: 195mm;
+                overflow: hidden;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .page-navette .sponsor-logo > div {
+                flex: 1 1 auto;
+                height: 35mm;
+                align-content: center;
+            }
+
+            .page-navette .sponsor-logo > div > .del {
+                display: none;
+            }
+
+            .page-navette .sponsor-logo > div > img {
+                max-height: 100%;
+                max-width: 100%;
+            }
+
+            .page-navette .categ {
+                font-size: 12mm;
+            }
+
+            .page-navette .dossard {
+                font-size: 33mm;
+            }
+
+            .page-navette .prenom {
+                font-size: 5mm;
+            }
+
+            .page-navette .nom {
+                font-size: 5.5mm;
+            }
+
+            .page-navette .club {
+                font-size: 4mm;
+            }
+
+            .page-navette .voie {
+                font-size: 5mm;
+                min-width: 80mm;
+            }
+
+            .page-navette .club-logo {
+                width: 100%;
+                height: 35mm;
+            }
+
+            .page-navette .club-logo img {
+                max-height: 100%;
+                max-width: 100%;
+            }
+
+            .page-navette .resultat {
+                padding: 0 0.8mm;
+                font-size: 4mm;
+            }
+
+            .page-navette .resultat tbody > tr {
+                height: auto;
+            }
+        </style>
+        <style id="style-page-dossard">
+            /* --------------------------------------------------------------- */
+            /* -- Css des pages de dossard ----------------------------------- */
+            /* --------------------------------------------------------------- */
+            .page-dossard {
+                display: flex;
+                align-items: center;
+                position: relative;
+                height: 50%;
+                width: 50%;
+                text-align: center;
+                flex-direction: column;
+                justify-content: center;
+                padding: 10mm;
+            }
+
+            .page-dossard:before, 
+            .page-dossard:after,
+            .page-dossard:nth-child(1) > :first-child:before {
+                position:absolute;
+                width:10mm; 
+                height: 10mm;
+                border-color:#ddd;
+                border-style:dashed;
+                border-width: 0;
+                content: ' ';
+            }
+
+            .page-dossard:nth-child(1):before {top:10mm;right:-0.5px;border-width: 0 1px 0 0}
+            .page-dossard:nth-child(1):after {bottom:-0.5px;right:-0.5px;border-width: 0 1px 1px 0}
+            .page-dossard:nth-child(1) > :first-child:before {bottom:-0.5px;left:10mm;border-width: 0 0 1px 0}
+
+            .page-dossard:nth-child(2):before {bottom:-0.5px;left:-0.5px;border-width: 0 0 1px 0}
+            .page-dossard:nth-child(2):after {bottom:-0.5px;right:10mm;border-width: 0 0 1px 0}
+
+            .page-dossard:nth-child(3):before {top:-0.5px;right:-0.5px;border-width: 0 1px 0 0}
+            .page-dossard:nth-child(3):after {bottom:10mm;right:-0.5px;border-width: 0 1px 0 0}
+
+            .page-dossard .prenom-nom {
+                font-size: 7.5mm;
+            }
+
+            .page-dossard .dossard {
+                font-size: 70mm;
+                line-height: 65mm;
+            }
+
+            .page-a4-portrait .page-dossard .dossard {
+                font-size: 50mm;
+            }
+
+            .page-dossard .club {
+                font-size: 5mm;
+            }
+
+            .page-dossard .club-logo {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                display: none;
+            }
+
+            .page-dossard .club-logo {
+                bottom: 10mm;
+                right: 10mm;
+            }
+            .page-dossard .club-logo img {
+                height: 11mm;
+            }
+        </style>
+        <style id="style-page-ticket">
+            /* --------------------------------------------------------------- */
+            /* -- Css des pages de ticket  ----------------------------------- */
+            /* --------------------------------------------------------------- */
+            .page-ticket {
+                display: flex;
+                align-items: center;
+                position: relative;
+                height: 20%;
+                width: 25%;
+                text-align: center;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .page-ticket {
+                padding: 10mm;
+            }
+
+            .page-ticket:before, 
+            .page-ticket:after,
+            .page-ticket > :first-child:before {
+                position:absolute;
+                width:5mm; 
+                height: 5mm;
+                border-color:#ddd;
+                border-style:dashed;
+                border-width: 0;
+                content: ' ';
+            }
+
+            .page-ticket:before {top:0;right:-0.5px;border-width: 0 1px 0 0}
+            .page-ticket:after {bottom:-0.5px;right:-0.5px;border-width: 0 1px 1px 0}
+            .page-ticket > :first-child:before {bottom:-0.5px;left:0;border-width: 0 0 1px 0}
+
+            .page-ticket:nth-child(1):before,
+            .page-ticket:nth-child(2):before,
+            .page-ticket:nth-child(3):before {
+                top: 10mm;
+            }
+
+            .page-ticket:nth-child(4):before,
+            .page-ticket:nth-child(8):before,
+            .page-ticket:nth-child(12):before,
+            .page-ticket:nth-child(16):before,
+            .page-ticket:nth-child(20):before {
+                border-width: 0;
+            }
+            .page-ticket:nth-child(4):after,
+            .page-ticket:nth-child(8):after,
+            .page-ticket:nth-child(12):after,
+            .page-ticket:nth-child(16):after,
+            .page-ticket:nth-child(20):after {
+                border-width: 0 0 1px 0;
+                right: 10mm;
+            }
+
+            .page-ticket:nth-child(17) > :first-child:before,
+            .page-ticket:nth-child(18) > :first-child:before,
+            .page-ticket:nth-child(19) > :first-child:before,
+            .page-ticket:nth-child(20) > :first-child:before {
+                border-width: 0;
+            }
+
+            .page-ticket:nth-child(17):after,
+            .page-ticket:nth-child(18):after,
+            .page-ticket:nth-child(19):after {
+                border-width: 0 1px 0 0;
+                bottom: 10mm;
+            }
+
+            .page-ticket:nth-child(1) > :first-child:before,
+            .page-ticket:nth-child(5) > :first-child:before,
+            .page-ticket:nth-child(9) > :first-child:before,
+            .page-ticket:nth-child(13) > :first-child:before,
+            .page-ticket:nth-child(17) > :first-child:before {
+                left: 10mm;
+            }
+
+            .page-ticket:nth-child(20):after {
+                border-width: 0;
+            }
+
+            .page-ticket .club {
+                font-size: 2.75mm;
+            }
+
+            .page-ticket .dossard {
+                font-size: 4.25mm;
+            }
+
+            .page-ticket .nom, 
+            .page-ticket .prenom {
+                font-size: 5.5mm;
+            }
+        </style>
+        <style id="style-page-accueil">
+            /* --------------------------------------------------------------- */
+            /* -- Css des pages de fiche d'accueil --------------------------- */
+            /* --------------------------------------------------------------- */  
+            .page-accueil {
+                width: 100%;
+            }
+
+            .page-accueil .accueil-title {
+                font-size: 12mm;
+                text-align: center;
+            }
+
+            .page-accueil .accueil-categ {
+                font-size: 12mm;
+                text-align: center;
+                padding: 2mm 4mm;
+            }
+
+            .page-accueil .club-logo {
+                position: relative;
+            }
+
+            .page-accueil .club-logo img {
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 18mm;
+            }
+
+            .page-accueil .accueil-sub-categ {
+                font-size: 8mm;
+            }
+
+            .page-accueil .accueil-head-licence {
+                text-align: center;
+            }
+
+            .page-accueil .accueil-head-presence {
+                width: 10mm;
+                text-align: center;
+            }
+
+            .page-accueil .accueil-head-commentaire {
+                width: 50mm;
+                text-align: center;
+            }
+
+            .page-accueil .dossard,
+            .page-accueil .categ {
+                text-align: center;
+            }
+
+            .page-accueil .licence {
+                text-align: right;
+            }
+        </style>
+        <style id="style-page-juge">
+            /* --------------------------------------------------------------- */
+            /* -- Css des pages de fiche de juge ----------------------------- */
+            /* --------------------------------------------------------------- */
+            .page-juge {
+                width: 100%;
+                font-size: 11pt;
+            }
+
+            .page-juge table.nowrap td {
+                padding: 0.4mm 1mm;
+            }
+
+            .page-juge .juge-sub-categ {
+                font-size: 6mm;
+                font-weight: bold;
+            }
+
+            .page-juge .juge-title, 
+            .page-juge .juge-voie {
+                font-size: 8mm;
+                text-align: center;
+                font-weight: bold;
+                padding: 1mm 4mm;
+            }      
+            
+            .page-juge .club-logo {
+                position: relative;
+            }
+            
+            .page-juge .club-logo img {
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 18mm;
+            }
+
+            .page-juge .essai {
+                text-align: center;
+                font-size: 4mm;
+            }
+
+            .page-juge .essai table td + td {
+                border-left: 1px dotted #ccc;
+            }
+
+            .page-juge .juge-essai {
+                font-size: 5mm;
+                text-align: center;
+                width: 50mm;
+            }
+
+            .page-juge .juge-sub-categ {
+                padding-top: 1mm;
+            }
+
+            .page-juge .dossard {
+                text-align: center;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    </head>
+    <body style="--bleeding: 10mm;" class="nb-voies-5">
+        <div class="zone-action-btns hidden-for-print">
+            <button id="print-button" onclick="window.print();">Imprimer / Sauvegarder en PDF</button>
+            <br><br>
+            <button id="reset-button" onclick="resetAll();">Réinitialiser</button>
+        </div>
+        <div class="page hidden-for-print" id="page-config">
+            <div class="page-config-instruction">
+                <div>
+                    <h1>Instructions d'utilisation</h1>
+                    <ol>
+                        <li>
+                            Préparer votre liste de participants au format "xlsx" ou "csv".
+                            <p>
+                                Le fichier doit comporter une ligne d'entête avec au moins les entêtes suivant :<br>
+                                Prénom, Nom, Club, Catégorie, Genre, Dossard
+                            </p>
+                        </li>
+                        <li>
+                            Choisir votre fichier avec le bouton "Parcourir/Choisir un fichier".
+                            <p>Si votre fichier est valide le nombre de participants trouvé doit s'afficher ainsi que les actions de génération.</p>
+                        </li>
+                        <li>
+                            Cliquer sur l'action souhaité.
+                            <p>Cela va générer automatiquement les pages.</p>
+                        </li>
+                        <li>
+                            Imprimer dans un fichier au format "PDF" pour sauvegarder.
+                        </li>
+                    </ol>
+                    <div id="upload-zone">
+                        <input type="file" id="UploadFile" accept=".xlsx,.csv" />
+                        <div id="file-info" class="hidden"> 
+                            <button id="generate-normalized-xlsx">Récupérer un XLSX propre</button>
+                        </div>
+                        <div id="file-error" class="hidden"></div>
+                    </div>
+                    <div id="part-info" class="hidden">
+                        Il y a <span id="nb-part-in-file"></span> participants !
+                        <ul id="detail-part-in-file">
+                        </ul>
+                    </div>
+                </div>
+                <div id="generate-actions" class="hidden">
+                    <fieldset>
+                        <legend>Fiches navettes</legend>
+                        <button id="generate-navette">Créer les fiches navettes</button>
+                        <p>1 fiche par page</p>
+                        <div id="choice-pages-navette"></div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Dossards</legend>
+                        <button id="generate-dossard">Créer les dossards</button>
+                        <p>4 dossards par page</p>
+                        <div id="choice-page-format-dossard">
+                            <label>
+                                Mode portrait :
+                                <input type="checkbox" id="chk-page-format-dossard" name="chk-page-format-dossard" value="portrait">
+                            </label>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                    <legend>Tickets</legend>
+                    <button id="generate-ticket">Créer les tickets</button>
+                    <p>20 tickets par page</p>
+                </fieldset>
+                <fieldset>
+                    <legend>Accueil</legend>
+                    <button id="generate-accueil">Créer les fiches d'accueil</button>
+                    <p>Listes en portrait A4</p>
+                </fieldset>
+                <fieldset>
+                <legend>Suivi juge</legend>
+                <button id="generate-juge">Créer les fiches de suivi juge</button>
+                <p>Listes en portrait A4</p>
+            </fieldset>
+                </div>
+            </div>
+            <div class="page-config-configuration">
+                <h1>Configuration</h1>
+                <div class="form-group">
+                    <h2>Évenement :</h2>
+                    <input type="text" id="event-name" class="input" placeholder="Nom de l'évenement" value="Contest Tour Isère 2024-2025"/>
+                </div>
+                <div class="form-group">
+                    <h2>Lieu :</h2>
+                    <input type="text" id="event-lieu" class="input" placeholder="Lieu de l'évenement" value="Échirolles"/>
+                </div>
+                <h2>Logo du club</h2>
+                <div class="config-club-logo">
+                    <div class="club-logo"></div>
+                    <button id="add-club-url">Ajouter un logo</button>
+                    <input id="club-url-file" type="file" class="input" style="display:none;" accept=".jpg,.jpeg,.png,.svg"/>
+                </div>
+                <h2>Logos des sponsors</h2>
+                <div class="config-sponsor-logo">
+                    <div class="sponsor-logo"></div>
+                    <button id="add-sponsor-url">Ajouter un logo</button>
+                    <input id="sponsor-url-files" type="file" multiple class="input" style="display:none;" accept=".jpg,.jpeg,.png,.svg"/>
+                </div>
+                <h2>Nombre de zones</h2>
+                <div class="config-nb-zone">
+                    <label>
+                        <input type="radio" name="choice-nb-zone" id="choice-nb-zone-3" value="3">
+                        2 zones + top
+                    </label>
+                    <label>
+                        <input type="radio" name="choice-nb-zone" id="choice-nb-zone-4" value="4">
+                        3 zones + top
+                    </label>
+                    <label>
+                        <input type="radio" name="choice-nb-zone" id="choice-nb-zone-5" value="5">
+                        4 zones + top
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="page page-navette hidden-for-print" id="template-page-navette">
+            <table>
+                <tbody>
+                    <tr class="h150">
+                        <td class="bordered" colspan="2">
+                            <span class="categ f-special f-bold f-upper f-color-categ">[CAT]</span>
+                        </td>
+                        <td colspan="7" class="navette-title">
+                            <span class="event-name f-upper f-bold" >Contest Tour Isère 2024-2025</span>
+                            <br><span class="event-lieu">❖ Échirolles ❖</span>
+                        </td>
+                        <td class="bordered" colspan="3" rowspan="2">
+                            <span class="dossard f-special f-bold f-upper f-color-categ">[N°]</span>
+                        </td>
+                    </tr>
+                    <tr class="h500">
+                        <td colspan="9" class="sponsor">
+                            <div class="sponsor-logo">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="h050">
+                        <td colspan="12"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered">
+                            <span class="prenom f-special f-capital">[prénom]</span>
+                        </td>
+                        <td colspan="4" class="bordered">
+                            <span class="nom f-special f-upper">[nom de famille]</span>
+                        </td>
+                        <td></td>
+                        <td colspan="5" class="bordered">
+                            <span class="club f-special f-upper">[club]</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="12"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="bordered voie cell-head" colspan="3">
+                            Voie 1
+                        </td>
+                        <td class="w125"></td>
+                        <td class="bordered voie cell-head" colspan="3">
+                            Voie 2
+                        </td>
+                        <td class="w125"></td>
+                        <td class="bordered voie cell-head" colspan="3">
+                            Voie 3
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="bordered nb-essai cell-head">
+                            1er essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            2ème essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            3ème essai
+                        </td>
+                        <td class="w125"></td>
+                        <td class="bordered nb-essai cell-head">
+                            1er essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            2ème essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            3ème essai
+                        </td>
+                        <td class="w125"></td>
+                        <td class="bordered nb-essai cell-head">
+                            1er essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            2ème essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            3ème essai
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bordered cell-head">
+                            Résultat
+                        </td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="w125"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="w125"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                    </tr>
+                    <tr>
+                        <td class="bordered cell-head">
+                            Signature
+                        </td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="w125"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="w125"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="12"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="bordered voie cell-head" colspan="3">
+                            Voie 4
+                        </td>
+                        <td class="w125"></td>
+                        <td class="bordered voie cell-head" colspan="3">
+                            Voie 5
+                        </td>
+                        <td class="w125"></td>
+                        <td colspan="3" rowspan="4">
+                            <div class="club-logo">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="bordered nb-essai cell-head">
+                            1er essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            2ème essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            3ème essai
+                        </td>
+                        <td class="w125"></td>
+                        <td class="bordered nb-essai cell-head">
+                            1er essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            2ème essai
+                        </td>
+                        <td class="bordered nb-essai cell-head">
+                            3ème essai
+                        </td>
+                        <td class="w125"></td>
+                    </tr>
+                    <tr>
+                        <td class="bordered cell-head">
+                            Résultat
+                        </td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="w125"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="bordered resultat"></td>
+                        <td class="w125"></td>
+                    </tr>
+                    <tr>
+                        <td class="bordered cell-head">
+                            Signature
+                        </td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="w125"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="bordered"></td>
+                        <td class="w125"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="12" class="resultat-info">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="page page-no-padding hidden-for-print" id="template-page-dossard">
+            <div class="page-dossard f-special">
+                <div class="prenom-nom">
+                    <span class="prenom f-capital">[prénom]</span> &nbsp; <span class="nom f-upper">[nom de famille]</span>
+                </div>
+                <div class="dossard f-bold">999</div>
+                <div class="club f-upper">[nom du club]</div>
+                <div class="club-logo"></div>
+            </div>
+        </div>
+        <div class="page page-no-padding hidden-for-print" id="template-page-ticket">
+            <div class="page-ticket f-special">
+                <div class="prenom-nom">
+                    <span class="prenom f-capital">[prénom]</span> &nbsp; <span class="nom f-upper">[nom de famille]</span>
+                </div>
+                <div class="club f-upper">[nom du club]</div>
+                <div class="dossard f-bold">999</div>
+            </div>
+        </div>
+        <div class="page page-a3 hidden" id="template-page-accueil">
+            <div class="page-accueil">
+                <table class="nowrap">
+                  <tbody>
+                    <tr>
+                      <td class="accueil-categ bordered bg-color-categ f-bold f-upper">[CAT]</td>
+                      <td colspan="5" class="accueil-title f-bold f-upper">Fiche d'accueil</td>
+                      <td colspan="2" class="club-logo"></td>
+                    </tr>
+                    <tr id="accueil-sub-categ-template" class="hidden">
+                      <td class="accueil-sub-categ f-bold f-upper" rowspan="2"></td>
+                      <td colspan="7"></td>
+                    </tr>
+                    <tr id="accueil-head-template" class="hidden">
+                      <td colspan="4"></td>
+                      <td class="bordered accueil-head-licence cell-head">Licence</td>
+                      <td class="bordered accueil-head-presence cell-head">Prés.</td>
+                      <td class="bordered accueil-head-commentaire cell-head">Commentaire</td>
+                    </tr>
+                    <tr id="accueil-line-template" class="striped hidden">
+                      <td class="nom bordered f-upper"></td>
+                      <td class="prenom bordered f-capital"></td>
+                      <td class="dossard bordered"></td>
+                      <td class="categ bordered f-upper"></td>
+                      <td class="club bordered f-upper"></td>
+                      <td class="licence bordered"></td>
+                      <td class="bordered"></td>
+                      <td class="remarque bordered"></td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page page-a3 hidden" id="template-page-juge">
+            <div class="page-juge">
+                <table class="nowrap">
+                <tbody>
+                    <tr>
+                        <td class="juge-title bordered bg-color-categ f-bold f-upper">[CAT]</td>
+                        <td class="club-logo"></td>
+                        <td></td>
+                        <td colspan="3" class="juge-voie bordered bg-color-categ f-bold">Voie 1</td>
+                    </tr>
+                    <tr id="juge-sub-categ-template" class="hidden">
+                        <td colspan="3" class="juge-sub-categ f-bold"></td>
+                        <td class="bordered juge-essai cell-head">1<sup>er</sup> essai</td>
+                        <td class="bordered juge-essai cell-head">2<sup>eme</sup> essai</td>
+                        <td class="bordered juge-essai cell-head">3<sup>eme</sup> essai</td>
+                    </tr>
+                    <tr class="striped hidden" id="juge-line-template">
+                        <td class="bordered nom f-upper"></td>
+                        <td class="bordered prenom f-capital"></td>
+                        <td class="bordered dossard"></td>
+                        <td class="bordered resultat essai"></td>
+                        <td class="bordered resultat essai"></td>
+                        <td class="bordered resultat essai"></td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <script id="script-page-config">
+            function resetAll() {
+                localStorage.clear();
+                window.location.reload();
+            }
+
+            class PageConfigEvent {
+                key = 'event';
+                name;
+                lieu;
+                
+                constructor() {
+                    this.load();
+                    this.init();
+                }
+
+                load() {
+                    this.name = localStorage.getItem(this.key + '-name') || '-- Nom de l\'événement --';
+                    this.lieu = localStorage.getItem(this.key + '-lieu') || '❖ Lieu de l\'événement ❖';
+                }
+
+                store() {
+                    localStorage.setItem(this.key + '-name', this.name);
+                    localStorage.setItem(this.key + '-lieu', this.lieu);
+                }
+
+                init() {
+                    const eventName = document.querySelector('#event-name');
+                    const eventLieu = document.querySelector('#event-lieu');
+
+                    eventName.value = this.name;
+                    eventLieu.value = this.lieu;
+
+                    eventName.addEventListener('change', (e) => {
+                        this.name = e.target.value;
+                        this.store();
+                        this.#display();
+                    });
+                    eventLieu.addEventListener('change', (e) => {
+                        this.lieu = e.target.value;
+                        this.store();
+                        this.#display();
+                    });
+
+                    this.#display();
+                }
+
+                #display() {
+                    const self = this;
+                    document.querySelectorAll('.event-name').forEach((el) => {
+                        el.innerHTML = self.name;
+                    });
+                    document.querySelectorAll('.event-lieu').forEach((el) => {
+                        el.innerHTML = self.lieu;
+                    });
+                }
+            }
+
+            class PageConfigClub {
+                key = 'logoClub';
+                logo;
+                
+                constructor() {
+                    this.load();
+                    this.init();
+                }
+
+                load() {
+                    const DEFAULT = 'data:image/jpeg;base64,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';
+
+                    if (!localStorage.hasOwnProperty(this.key)) {
+                        this.logo = DEFAULT;
+                        this.store();
+                    } else {
+                        this.logo = localStorage.getItem(this.key);
+                    }
+                }
+
+                store() {
+                    localStorage.setItem(this.key, this.logo);
+                }
+
+                set(logo) {
+                    this.logo = logo;
+                    this.store();
+                }
+
+                init() {
+                    this.#display();
+                }
+
+                #display() {
+                    const self = this;
+                    document.querySelectorAll(".club-logo").forEach(function(logoClub) {
+                        const img = document.createElement("img");
+                        img.src = self.logo;
+                        logoClub.appendChild(img);
+                    });
+                }
+            };
+
+            class PageConfigNbZones {
+                key = 'nbZones';
+                number;
+                constructor() {
+                    this.load();
+                    this.init();
+                }
+
+                load() {
+                    const DEFAULT = 3;
+
+                    if (!localStorage.hasOwnProperty(this.key)) {
+                        this.number = DEFAULT;
+                        this.store();
+                    } else {
+                        this.number = localStorage.getItem(this.key);
+                    }
+                }
+
+                store() {
+                    localStorage.setItem(this.key, this.number);
+                }
+
+                set(nb) {
+                    this.number = nb;
+                    this.store();
+                    this.#display();
+                }
+
+                init() {
+                    const self = this;
+
+                    // Check curent choice
+                    document.getElementById('choice-nb-zone-' + this.number).checked = true;
+
+                    // Add event on nbZone change
+                    document.querySelectorAll('input[name=choice-nb-zone]').forEach(function(radio) {
+                        radio.addEventListener('change', function(){
+                            self.set(document.querySelector('input[name=choice-nb-zone]:checked').value);
+                        });
+                    });
+
+                    self.#display();
+                }
+
+                #display() {
+                    const resultTable = document.createElement('table');
+                    resultTable.classList.add('nowrap');
+                    const resultTableTr = resultTable.insertRow();
+
+                    const resultTableInfo = document.createElement('table');
+                    resultTableInfo.classList.add('nowrap');
+                    const resultTableInfoTr = resultTableInfo.insertRow();
+
+                    for (let i = 0; i < this.number; i++) {
+                        resultTableTr.insertCell().innerText = i;
+
+                        let htmlContent = '<strong>'+ i + '</strong> = a atteint Z' + i;
+                        if (i === 0) {
+                            htmlContent = '<strong>'+ i + '</strong> = n\'a pas atteint Z1';
+                        }
+                        resultTableInfoTr.insertCell().innerHTML = htmlContent;
+                    }
+
+                    resultTableTr.insertCell().innerText = 'T';
+                    resultTableInfoTr.insertCell().innerHTML = '<strong>T</strong> = a topé la voie';
+
+                    document.querySelectorAll('.resultat').forEach(function(resultZone) {
+                        resultZone.innerHTML = '';
+                        resultZone.appendChild(resultTable.cloneNode(true));
+                    });
+
+
+                    document.querySelectorAll('.resultat-info').forEach(function(resultInfoZone) {
+                        resultInfoZone.innerHTML = '';
+                        resultInfoZone.appendChild(resultTableInfo.cloneNode(true));
+                    });
+                }
+            };
+
+            class PageConfigSponsors {
+                key = 'logosSponsors';
+                logos;
+                constructor() {
+                    this.load();
+                    
+                    this.init();
+                }
+
+                load() {
+                    const SPONSOR_TPL = 'data:image/jpeg;base64,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';
+                    const FFME_LOGO = 'data:image/jpeg;base64,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';
+                    const DEFAULT = [
+                        FFME_LOGO,
+                        SPONSOR_TPL,
+                        SPONSOR_TPL,
+                        SPONSOR_TPL
+                    ];
+
+                    if (!localStorage.hasOwnProperty(this.key)) {
+                        this.logos = DEFAULT;
+                        this.store();
+                    } else {
+                        this.logos = JSON.parse(localStorage.getItem(this.key));
+                    }
+
+                    this.#display();
+                }
+
+                store() {
+                    localStorage.setItem(this.key, JSON.stringify(this.logos));
+                }
+
+                add(logo) {
+                    this.logos.push(logo);
+                    this.store();
+                    this.#display();
+                }
+
+                deleteByIndex(index) {
+                    this.logos.splice(index, 1);
+                    this.store();
+                    this.#display();
+                }
+
+                init() {
+                    const self = this;
+                    const addInputFile = document.getElementById('sponsor-url-files');
+                    const addButton = document.getElementById('add-sponsor-url');
+                    const zoneLogosSponsor = document.querySelector('#page-config .sponsor-logo');
+
+                    // Trigger inputFile when click on add button.
+                    addButton.addEventListener('click', () => { 
+                        addInputFile.click();
+                    });
+
+                    // Add event on upload files
+                    addInputFile.addEventListener('change', function (e) {
+                        const files = e.target.files
+
+                        for (let i = 0; i < files.length; i++) {
+                            const reader = new FileReader();
+                            reader.readAsDataURL(files[i]);
+                            reader.onload = function () {
+                                self.add(reader.result);
+                            };
+                            reader.onerror = function (error) {
+                                console.log('Error: ', error);
+                            };
+                        }   
+                    });
+
+                    // Add event for deletion of logo
+                    zoneLogosSponsor.addEventListener('click', function (e) {
+                        if (e.target !== null && e.target.classList.contains("del")) {
+                            const imgIndex = e.target.dataset.imgIndex;
+                            self.deleteByIndex(imgIndex);
+                        }
+                    });
+
+                }
+
+                #display() {
+                    const logosSponsorTmp = document.createElement("div");
+                    this.logos.forEach(function (url, index) {
+                        const img = document.createElement("img");
+                        img.src = url;
+                        const div = document.createElement("div");
+                        const divDel = document.createElement("div");
+                        divDel.classList.add('del');
+                        divDel.innerText = 'X';
+                        divDel.dataset.imgIndex = index;
+                        div.appendChild(divDel);
+                        div.appendChild(img);
+                        logosSponsorTmp.appendChild(div);
+                    });
+
+                    document.querySelectorAll(".sponsor-logo").forEach(function(sponsor) {
+                        sponsor.innerHTML = logosSponsorTmp.innerHTML;
+                    })
+                }
+            };
+
+            class PageConfigParticipants {
+                list;
+                listByCategories;
+                keyColorsCateg = 'colors-categories';
+                defaultColorCateg = {
+                    "u10": "#49ab81",
+                    "u11": "#49ab81",
+                    "u12": "#005b96",
+                    "u13": "#005b96",
+                    "u14": "#a32020",
+                    "u15": "#a32020",
+                };
+
+                constructor() {
+                    this.loadColorCateg();
+                    this.loadParticipants();
+                    this.init();
+                    this.initParticipants();
+                }
+
+                #allowedKeys = [
+                    'nom',
+                    'prenom',
+                    'dossard',
+                    'club',
+                    'categorie',
+                    'genre',
+                    'subCategorie',
+                    'remarque',
+                    'licence',
+                ];
+
+                #preparedKeys = [
+                    'nom',
+                    'prenom',
+                    'genre',
+                    'dossard',
+                    'club',
+                ];
+
+                storeColorCateg() {
+                    localStorage.setItem(this.keyColorsCateg, JSON.stringify(this.colorsCateg));
+                }
+
+                loadColorCateg() {
+                    if (localStorage.hasOwnProperty(this.keyColorsCateg)) {
+                        this.colorsCateg = JSON.parse(localStorage.getItem(this.keyColorsCateg));
+                    } else {
+                        this.colorsCateg = {...this.defaultColorCateg};
+                    }
+                }
+
+                storeParticipants() {
+                    localStorage.setItem('participants-list', JSON.stringify(this.list));
+                    localStorage.setItem('participants-list-by-categories', JSON.stringify(this.listByCategories));
+                }
+
+                loadParticipants() {
+                    if (localStorage.hasOwnProperty('participants-list')) {
+                        this.list = JSON.parse(localStorage.getItem('participants-list'));
+                    } else {
+                        this.list = [];
+                    }
+
+                    if (localStorage.hasOwnProperty('participants-list-by-categories')) {
+                        this.listByCategories = JSON.parse(localStorage.getItem('participants-list-by-categories'));
+                    } else {
+                        this.listByCategories = {};
+                    }
+                }
+
+                initParticipants() {
+                    const self = this;
+                    if (self.list.length > 0) {
+                        document.getElementById('generate-actions').classList.remove('hidden');
+                        document.getElementById('file-info').classList.remove('hidden');
+                        document.getElementById('part-info').classList.remove('hidden');
+                        document.getElementById('nb-part-in-file').textContent = self.list.length;
+
+                        let detailPartInFile = document.getElementById('detail-part-in-file');
+                        detailPartInFile.innerHTML = '';
+
+                        for (const [cat, subCats] of Object.entries(self.listByCategories)) {
+                            const catUp = cat.toUpperCase();
+                            let catHTML = '<li>'+catUp+' : <input type="color" class="color-for-categ" name="color-'+catUp+'"><ul>';
+
+                            for (const [subCat, parts] of Object.entries(subCats)) {
+                                const catFull = catUp + subCat.toUpperCase();
+                                catHTML += '<li>' + subCat.toUpperCase() + ' : ' + parts.length + '</li>';
+                            }
+                            catHTML += '</ul></li>';
+                            detailPartInFile.innerHTML += catHTML;
+                        }
+                        let restorColorCategBtn = '<li><ul><button id="restore-color-categ">Restaurer les couleurs par défaut</button></ul></li>';
+                        detailPartInFile.innerHTML += restorColorCategBtn;
+
+                        document.getElementById('restore-color-categ').addEventListener('click', () => {
+                            self.colorsCateg = {...self.defaultColorCateg};
+                            self.storeColorCateg();
+                            self.applyCategStyle();
+
+                            // Met à jour les input color
+                            document.querySelectorAll('.color-for-categ').forEach(colorPicker => {
+                                const category = colorPicker.name.replace('color-', '').toLowerCase(); // Extrait la catégorie depuis le name
+                                colorPicker.value = self.colorsCateg[category];
+                            });
+                        });
+
+                        document.querySelectorAll('.color-for-categ').forEach(colorPicker => {
+                            const category = colorPicker.name.replace('color-', '').toLowerCase(); // Extrait la catégorie depuis le name
+                            if (self.colorsCateg[category] === undefined) {
+                                self.colorsCateg[category] = '#000000';
+                            } 
+
+                            colorPicker.value = self.colorsCateg[category];
+
+                            colorPicker.addEventListener('input', (event) => {
+                                const category = event.target.name.replace('color-', '').toLowerCase(); // Extrait la catégorie depuis le name
+                                self.colorsCateg[category] = event.target.value;
+                                self.storeColorCateg();
+                                self.applyCategStyle();
+                            });
+                        });
+                        self.storeColorCateg();
+                    }
+                }
+
+                init() {
+                    const self = this;
+                    const inputUploadFile = document.getElementById('UploadFile');
+                    const generateNormalizedXlsx = document.getElementById("generate-normalized-xlsx");
+
+                    inputUploadFile.addEventListener("change", function () {
+                        showTemplate();
+                        document.getElementById('generate-actions').classList.add('hidden');
+                        document.getElementById('file-info').classList.add('hidden');
+                        document.getElementById('part-info').classList.add('hidden');
+                        var fileError = document.getElementById('file-error');
+                        fileError.innerHTML = '';
+                        fileError.classList.add('hidden');
+
+                        var reader = new FileReader();
+                        reader.onload = function() {
+                            var arrayBuffer = this.result;
+                            var array = new Uint8Array(arrayBuffer);
+                            var binaryString = String.fromCharCode.apply(null, array);
+                            var workbook = XLSX.read(binaryString, {
+                                type: "binary"
+                            });
+                            var first_sheet_name = workbook.SheetNames[0];
+                            /* Get worksheet */
+                            var worksheet = workbook.Sheets[first_sheet_name];
+                            const listXlsx = XLSX.utils.sheet_to_json(worksheet, {
+                                raw: true
+                            });
+
+                            if (typeof listXlsx[0] === "undefined") {
+                                fileError.innerHTML = 'Le fichier semble vide !!!';
+                                fileError.classList.remove('hidden');
+                                
+                                return;
+                            }
+
+                            self.#normalizeDatas([listXlsx[0]]);
+
+                            let error = false;
+                            if (typeof self.list[0].nom === "undefined") {
+                                error = true;
+                                fileError.innerHTML += "- Il manque l'entête \"Nom\"<br>";
+                            }
+                            if (typeof self.list[0].prenom === "undefined") {
+                                error = true;
+                                fileError.innerHTML += "- Il manque l'entête \"Prénom\"<br>";
+                            }
+                            if (typeof self.list[0].club === "undefined") {
+                                error = true;
+                                fileError.innerHTML += "- Il manque l'entête \"Club\"<br>";
+                            }
+                            if (typeof self.list[0].genre === "undefined") {
+                                error = true;
+                                fileError.innerHTML += "- Il manque l'entête \"Genre\"<br>";
+                            }
+                            if (typeof self.list[0].categorie === "undefined") {
+                                error = true;
+                                fileError.innerHTML += "- Il manque l'entête \"Catégorie\"<br>";
+                            }
+                            if (typeof self.list[0].dossard === "undefined") {
+                                error = true;
+                                fileError.innerHTML += "- Il manque l'entête \"Dossard\"<br>";
+                            }
+                            if (error) {
+                                fileError.classList.remove('hidden');
+
+                                return;
+                            }
+
+                            self.#normalizeDatas(listXlsx);
+                            self.storeParticipants();
+                            self.initParticipants();
+                        };
+
+                        reader.readAsArrayBuffer(inputUploadFile.files[0]);
+                    });
+
+                    generateNormalizedXlsx.addEventListener("click", () => {
+                        const participantsWorkbook = XLSX.utils.book_new();
+
+                        const listFullWorksheet = XLSX.utils.json_to_sheet(self.list, {header:self.#allowedKeys})
+                        XLSX.utils.book_append_sheet(participantsWorkbook, listFullWorksheet, "Participants complet");
+
+                        for (const [cat, subCats] of Object.entries(self.listByCategories)) {
+                            for (const [subCat, parts] of Object.entries(subCats)) {
+                                const catFull = cat.toUpperCase() + subCat.toUpperCase();
+                                
+                                let preparedList = [];
+                                for (let i = 0; i < parts.length; i++) {
+                                    preparedList.push({
+                                        'nom': parts[i].nom,
+                                        'prenom': parts[i].prenom,
+                                        'genre': parts[i].subCategorie,
+                                        'dossard': parts[i].dossard,
+                                        'club': parts[i].club,
+                                    })
+                                }
+                                const listCategWorksheet = XLSX.utils.json_to_sheet(preparedList, {header:self.#preparedKeys});
+                                XLSX.utils.book_append_sheet(participantsWorkbook, listCategWorksheet, "Participants " + catFull);
+                            }
+                        }
+
+                        XLSX.writeFile(participantsWorkbook, "Liste_Participants.xlsx", { compression: true });
+                    });
+                }
+
+                applyCategStyle() {
+                    let newStyles = '';
+                    const self = this;
+                    for (const [category, color] of Object.entries(self.colorsCateg)) {
+                        const inversColor = self.brightnessByColor(color) < 128 ? '#fff' : '#000';
+
+                        newStyles += `
+                            .${category} .f-color-categ { color: ${color}; }
+                            .${category} .bg-color-categ { background-color: ${color}; color: ${inversColor}; }
+                        `;
+                    }
+                    const styleElement = document.getElementById('style-categ');
+                    styleElement.innerHTML = newStyles;
+                }
+
+                brightnessByColor(color) {
+                    let m = color.substr(1).match(color.length == 7 ? /(\S{2})/g : /(\S{1})/g);
+                    if (m) {
+                        let r = parseInt(m[0], 16), g = parseInt(m[1], 16), b = parseInt(m[2], 16);
+
+                        return ((r*299)+(g*587)+(b*114))/1000;
+                    } 
+                    
+                    return false
+                }
+
+                #removeAccents(str) {
+                    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                }
+
+                #capitalize(str) {
+                    return str.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
+                }
+
+                #mergeList(tableau1, tableau2) {
+                    // Créer une Map pour stocker les entrées uniques
+                    const map = new Map();
+                    
+                    // Fonction pour générer une clé unique
+                    function genererCle(participant) {
+                        if (participant.licence) {
+                        return `licence_${participant.licence}`;
+                        }
+                        return `composite_${participant.nom}_${participant.prenom}_${participant.club}_${participant.categorie}`;
+                    }
+                    
+                    // Ajouter les éléments du premier tableau
+                    tableau1.forEach(participant => {
+                        const cle = genererCle(participant);
+                        map.set(cle, participant);
+                    });
+                    
+                    // Ajouter les éléments du deuxième tableau (écrase les doublons du premier)
+                    tableau2.forEach(participant => {
+                        const cle = genererCle(participant);
+                        map.set(cle, participant);
+                    });
+                    
+                    // Convertir la Map en tableau
+                    return Array.from(map.values());
+                }
+
+                #normalizeDatas(datas) {
+                    const self = this;
+
+                    let initDossard = false;
+
+                    let dossardCalulator = {};
+                    var normalizedKeysRaw = [];
+                    var normalizedKeys = [];
+                    self.listByCategories = {};
+
+                    let normalizedList = [];
+                    let normalizedListByCategories = {};
+
+                    var listCateg = [];
+                    var listSubCateg = [];
+                    for (let i = 0; i < datas.length; i++) {
+                        normalizedKeysRaw[i] = Object.fromEntries(
+                        Object.entries(datas[i]).map(([key, value]) => {
+                            let normalizedKey = self.#removeAccents(key).toLowerCase();
+                            let normalizeValue = value;
+                            if (typeof value === "string") {
+                                normalizeValue = value.toUpperCase();
+                                if (normalizedKey === "prenom") {
+                                    normalizeValue = self.#capitalize(value);
+                                }
+                            }
+
+                            return [normalizedKey, normalizeValue]
+                        })
+                        );
+
+                        normalizedKeys[i] = Object.fromEntries(
+                            Object.entries(normalizedKeysRaw[i]).filter(
+                                ([key, val]) => self.#allowedKeys.includes(key)
+                            )
+                        );
+
+                        if (typeof normalizedKeys[i].genre !== "undefined") {
+                            let genreLower = normalizedKeys[i].genre.toLowerCase();
+                            if (genreLower === "femme" || genreLower === "f") {
+                                normalizedKeys[i]['subCategorie'] = 'F';
+                            } else {
+                                normalizedKeys[i]['subCategorie'] = 'M';
+                            }
+                        }
+
+                        if (typeof normalizedKeys[i].licence === "undefined") {
+                            normalizedKeys[i].licence = '';
+                        }
+
+                        if (typeof self.listByCategories[normalizedKeys[i].categorie] === "undefined") {
+                            listCateg.push(normalizedKeys[i].categorie);
+                            self.listByCategories[normalizedKeys[i].categorie] = {};
+                        }
+
+                        if (typeof self.listByCategories[normalizedKeys[i].categorie][normalizedKeys[i].subCategorie] === "undefined") {
+                            listSubCateg.push(normalizedKeys[i].subCategorie);
+                            self.listByCategories[normalizedKeys[i].categorie][normalizedKeys[i].subCategorie] = [];
+                        }
+
+                        if (i === 0 && Number.isInteger(normalizedKeys[i].dossard) === false) {
+                            initDossard = true;
+                        }
+
+                        self.listByCategories[normalizedKeys[i].categorie][normalizedKeys[i].subCategorie] = self.#mergeList(
+                            self.listByCategories[normalizedKeys[i].categorie][normalizedKeys[i].subCategorie],
+                            [normalizedKeys[i]]
+                        );
+                    }
+
+                    for (let i = 0; i < listCateg.length; i++) {
+                        for (let j = 0; j < listSubCateg.length; j++) {
+                            if (typeof self.listByCategories[listCateg[i]][listSubCateg[j]] !== "undefined") {
+                                self.listByCategories[listCateg[i]][listSubCateg[j]].sort((a, b) => a.prenom.localeCompare(b.prenom));
+                                self.listByCategories[listCateg[i]][listSubCateg[j]].sort((a, b) => a.nom.localeCompare(b.nom));
+                            }
+                        }
+
+                        self.listByCategories[listCateg[i]] = self.#sortByKeys(self.listByCategories[listCateg[i]]);
+                    }
+
+                    self.listByCategories = self.#sortByKeys(self.listByCategories);
+
+
+                    if (initDossard) {
+                        const dossardIncrease = 50;
+                        let dossardStart = 100;
+                        let currentDossard = 0;
+                            
+                        let normalizedKeysDossard = [];
+
+                        for (const [cat, subCats] of Object.entries(self.listByCategories)) {
+                            for (const [subCat, parts] of Object.entries(subCats)) {
+                                currentDossard = dossardStart;
+                                for (let i = 0; i < parts.length; i++) {
+                                    parts[i].dossard = ++currentDossard;
+                                    normalizedKeysDossard.push(parts[i]);
+                                    self.listByCategories[cat][subCat][i] = parts[i];
+                                }
+                                dossardStart += dossardIncrease;
+                            }
+                        }
+
+                        normalizedKeysDossard.sort((a, b) => a.prenom.localeCompare(b.prenom));
+                        normalizedKeysDossard.sort((a, b) => a.nom.localeCompare(b.nom));
+
+                        normalizedKeys = normalizedKeysDossard;
+                    }
+                    
+                    self.normalizedList = normalizedKeys;
+
+                    // On fusionne self.list et self.normalizedList en dédoublonant les entrées en fonction de licence si il y en a une sinon nom+prenom+catégorie
+                    self.list = self.#mergeList(self.list, self.normalizedList);
+
+                }
+
+                #sortByKeys(obj) {
+                    const sortedKeys = Object.keys(obj).sort();
+                    const sortedObj = {};
+                    sortedKeys.forEach(key => {
+                        sortedObj[key] = obj[key];
+                    });
+
+                    return sortedObj;
+                }
+            }
+        </script>
+        <script>
+            const pageConfigEvent = new PageConfigEvent();
+            const pageConfigSponsors = new PageConfigSponsors();
+            const pageConfigClub = new PageConfigClub();
+            const pageConfigNbZones = new PageConfigNbZones();
+            const pageConfigParticipants = new PageConfigParticipants();
+
+            function setPageSizeA4() {
+                const style = document.getElementById('style-media-page');
+                style.innerHTML = `@page {size: A4 landscape; margin: 0;}`;
+            }
+            function setPageSizeA4Portrait() {
+                const style = document.getElementById('style-media-page');
+                style.innerHTML = `@page {size: A4 portrait; margin: 0;}`;
+            }
+            function setPageSizeA3() {
+                const style = document.getElementById('style-media-page');
+                style.innerHTML = `@page {size: A3 portrait; margin: 0;}`;
+            }
+            
+            let currentGeneration = null;
+            
+            /*
+            * Define templates variables
+            */
+            const templateNavette = document.getElementById("template-page-navette");
+            const templateDossard = document.getElementById("template-page-dossard");
+            const templateTicket = document.getElementById("template-page-ticket");
+            const templateAccueil = document.getElementById("template-page-accueil");
+            const templateJuge = document.getElementById("template-page-juge");
+            
+            /*
+            * Define Button action variables
+            */
+            const generateNavette = document.getElementById("generate-navette");
+            const choicePagesNavette = document.getElementById('choice-pages-navette');
+            const generateDossard = document.getElementById("generate-dossard");
+            const chkPageFormatDossard = document.getElementById('chk-page-format-dossard');
+            const generateTicket = document.getElementById("generate-ticket");
+            const generateAccueil = document.getElementById("generate-accueil");
+            const generateJuge = document.getElementById("generate-juge");
+            
+            /*
+            * Masque les templates
+            */
+            function cleanForGeneration() {
+                currentGeneration = null;
+                document.querySelectorAll(".generated-page").forEach(e => e.remove());
+                templateNavette.classList.add('hidden');
+                templateDossard.classList.add('hidden');
+                templateTicket.classList.add('hidden');
+                choicePagesNavette.innerHTML = '';
+            }
+
+            /*
+            * Affiche les templates
+            */
+            function showTemplate() {
+                currentGeneration = null;
+                document.querySelectorAll(".generated-page").forEach(e => e.remove());
+                templateNavette.classList.remove('hidden');
+                templateDossard.classList.remove('hidden');
+                templateTicket.classList.remove('hidden');
+            }
+            
+            function cloneTemplate(template) {
+                const clone = template.cloneNode(true);
+                clone.removeAttribute('id');
+                clone.classList.remove('hidden');
+                clone.classList.remove('hidden-for-print');
+                clone.classList.add('generated-page');
+
+                return clone;
+            }            
+
+            /**
+             * Event de la generation des fiches navette
+             */
+            generateNavette.addEventListener("click", () => {
+                setPageSizeA4();
+                cleanForGeneration();
+                currentGeneration = 'navette';
+
+                for (const [cat, subCats] of Object.entries(pageConfigParticipants.listByCategories)) {
+                    for (const [subCat, parts] of Object.entries(subCats)) {
+                    const catLower = cat.toLowerCase();
+                    const catFull = catLower + subCat.toLowerCase();
+
+                    let label = document.createElement('label');
+                    label.innerText = catFull;
+                    let chk = document.createElement('input');
+                    chk.type = 'checkbox';
+                    chk.checked = true;
+                    chk.dataset.catFull = catFull;
+                    chk.addEventListener("change", (event) => {
+                        const elm = event.target;
+                        const pages = document.querySelectorAll('.page-navette.' + elm.dataset.catFull);
+                        if (elm.checked) {
+                            pages.forEach(function (page) {
+                                page.classList.remove('hidden');
+                            });
+                        } else {
+                            pages.forEach(function (page) {
+                                page.classList.add('hidden');
+                            });
+                        }
+                    });
+
+                    label.appendChild(chk);
+                    choicePagesNavette.appendChild(label);
+
+                    for (let i = 0; i < parts.length; i++) {
+                        const clone = cloneTemplate(templateNavette);
+                        clone.classList.add(catLower);
+                        clone.classList.add(catFull);
+                        clone.querySelector('.nom').textContent = parts[i].nom;
+                        clone.querySelector('.prenom').textContent = parts[i].prenom;
+                        clone.querySelector('.club').textContent = parts[i].club;
+                        clone.querySelector('.categ').textContent = catFull;
+                        clone.querySelector('.dossard').textContent = parts[i].dossard;
+                        document.body.appendChild(clone);
+                    }
+                    }
+                }
+            });
+            
+            /**
+             * Event de la generation des dossards
+             */
+            generateDossard.addEventListener("click", () => {
+                setPageSizeA4();
+                cleanForGeneration();
+                currentGeneration = 'dossard';
+                let dossardInPage = 0;
+                let clone;
+                for (const [cat, subCats] of Object.entries(pageConfigParticipants.listByCategories)) {
+                    for (const [subCat, parts] of Object.entries(subCats)) {
+                        for (let i = 0; i < parts.length; i++) {
+                            if (dossardInPage === 0) {
+                                clone = cloneTemplate(templateDossard);
+                                clone.innerHTML = '';
+                            }
+                            dossardInPage++;
+
+                            const dossTpl = cloneTemplate(templateDossard.querySelector('.page-dossard'));
+
+                            dossTpl.querySelector('.nom').textContent = parts[i].nom;
+                            dossTpl.querySelector('.prenom').textContent = parts[i].prenom;
+                            dossTpl.querySelector('.dossard').textContent = parts[i].dossard;
+                            dossTpl.querySelector('.club').textContent = parts[i].club;
+
+                            clone.appendChild(dossTpl);
+                            
+                            if (dossardInPage === 4) {
+                                document.body.appendChild(clone);
+                                dossardInPage = 0;
+                            }
+                        }
+                    }
+                }
+                if (dossardInPage > 0) {
+                    document.body.appendChild(clone);
+                }
+            });
+            
+            function applyPageFormDossard() {
+                if (chkPageFormatDossard.checked) {
+                    templateDossard.classList.add('page-a4-portrait');
+
+                    if (currentGeneration === 'dossard') {
+                        setPageSizeA4Portrait();
+                        document.querySelectorAll('.generated-page').forEach(function(page) {
+                            page.classList.add('page-a4-portrait');
+                        });
+                    }
+                } else {
+                    templateDossard.classList.remove('page-a4-portrait');
+
+                    if (currentGeneration === 'dossard') {
+                        setPageSizeA4();
+                        document.querySelectorAll('.generated-page').forEach(function(page) {
+                            page.classList.remove('page-a4-portrait');
+                        });
+                    }
+                }
+            }
+
+            chkPageFormatDossard.addEventListener("click", () => {
+                applyPageFormDossard();
+            });
+
+            /**
+             * Event de la generation des tickets
+             */
+            generateTicket.addEventListener("click", () => {
+                setPageSizeA4();
+                cleanForGeneration();
+                currentGeneration = 'ticket';
+                let ticketdInPage = 0;
+                let clone;
+                for (const [cat, subCats] of Object.entries(pageConfigParticipants.listByCategories)) {
+                    for (const [subCat, parts] of Object.entries(subCats)) {
+                        for (let i = 0; i < parts.length; i++) {
+                            if (ticketdInPage === 0) {
+                                clone = cloneTemplate(templateTicket);
+                                clone.innerHTML = '';
+                            }
+                            ticketdInPage++;
+
+                            const ticketTpl = cloneTemplate(templateTicket.querySelector('.page-ticket'));
+                            ticketTpl.querySelector('.nom').textContent = parts[i].nom;
+                            ticketTpl.querySelector('.prenom').textContent = parts[i].prenom;
+                            ticketTpl.querySelector('.dossard').textContent = parts[i].dossard;
+                            ticketTpl.querySelector('.club').textContent = parts[i].club;
+                            
+                            clone.appendChild(ticketTpl);
+                            
+                            if (ticketdInPage === 20) {
+                                document.body.appendChild(clone);
+                                ticketdInPage = 0;
+                            }
+                        }
+                    }
+                }
+                if (ticketdInPage > 0) {
+                    while (ticketdInPage < 20) {
+                        ticketdInPage++;
+                        const ticketTpl = cloneTemplate(templateTicket.querySelector('.page-ticket'));
+                        ticketTpl.querySelector('.nom').textContent = '';
+                        ticketTpl.querySelector('.prenom').textContent = '';
+                        ticketTpl.querySelector('.dossard').textContent = '';
+                        ticketTpl.querySelector('.club').textContent = '';
+                        clone.appendChild(ticketTpl);
+                    }
+
+                    document.body.appendChild(clone);
+                }
+            });
+
+            /**
+             * Event de la generation des fiches d'accueil
+             */
+            generateAccueil.addEventListener("click", () => {
+                setPageSizeA3();
+                cleanForGeneration();
+                currentGeneration = 'accueil';
+                const subCateglineClone = document.getElementById('accueil-sub-categ-template').cloneNode(true);
+                subCateglineClone.removeAttribute('id');
+                subCateglineClone.classList.remove('hidden');
+
+                const headClone = document.getElementById('accueil-head-template').cloneNode(true);
+                headClone.removeAttribute('id');
+                headClone.classList.remove('hidden');
+
+                const lineClone = document.getElementById('accueil-line-template').cloneNode(true);
+                lineClone.removeAttribute('id');
+                lineClone.classList.remove('hidden');
+
+                for (const [cat, subCats] of Object.entries(pageConfigParticipants.listByCategories)) {
+                    const clone = cloneTemplate(templateAccueil);
+                    clone.querySelector('.page-accueil').classList.add(cat.toLowerCase());
+                    clone.querySelector('.accueil-categ').innerText = cat.toUpperCase();
+
+                    let tbody = clone.querySelector('tbody');
+                    for (const [subCat, parts] of Object.entries(subCats)) {
+                        let tr = document.createElement('tr');
+                        let tdEmpty = document.createElement('td');
+                        tdEmpty.setAttribute("colspan", "7");
+                        tdEmpty.innerHTML = '&nbsp;';
+                        tr.appendChild(tdEmpty);
+                        tbody.appendChild(tr);
+
+                        let trSubCat = subCateglineClone.cloneNode(true);
+                        trSubCat.querySelector('.accueil-sub-categ').innerText = cat + subCat;
+                        tbody.appendChild(trSubCat);
+
+                        let trHead = headClone.cloneNode(true);
+                        tbody.appendChild(trHead);
+
+                        for (let i = 0; i < parts.length; i++) {
+                            let tr = lineClone.cloneNode(true);
+
+                            tr.querySelector('.nom').innerText = parts[i].nom;
+                            tr.querySelector('.prenom').innerText = parts[i].prenom;
+                            tr.querySelector('.dossard').innerText = parts[i].dossard;
+                            tr.querySelector('.categ').innerText = parts[i].categorie + parts[i].subCategorie;
+                            tr.querySelector('.club').innerText = parts[i].club;
+
+                            tr.querySelector('.licence').innerText = parts[i].licence;
+                            if (typeof(parts[i].remarque) !== 'undefined') {
+                                tr.querySelector('.remarque').innerHTML = '⚠';
+                            }
+
+                            tbody.appendChild(tr);
+                        }
+                    }
+
+                    document.body.appendChild(clone);
+                }
+            });
+
+            /**
+             * Event de la generation des fiches de juge
+             */
+            generateJuge.addEventListener("click", () => {
+                setPageSizeA3();
+                cleanForGeneration();
+                currentGeneration = 'juge';
+
+                const subCateglineClone = document.getElementById('juge-sub-categ-template').cloneNode(true);
+                subCateglineClone.removeAttribute('id');
+                subCateglineClone.classList.remove('hidden');
+
+                const lineClone = document.getElementById('juge-line-template').cloneNode(true);
+                lineClone.removeAttribute('id');
+                lineClone.classList.remove('hidden');
+
+                for (const [cat, subCats] of Object.entries(pageConfigParticipants.listByCategories)) {
+                    for (let voie = 1; voie <= 5; voie++) {
+                        const clone = cloneTemplate(templateJuge);
+                        clone.querySelector('.page-juge').classList.add(cat.toLowerCase());
+                        clone.querySelector('.juge-title').innerText = cat.toUpperCase();
+                        clone.querySelector('.juge-voie').innerText = 'Voie ' + voie;
+
+                        let tbody = clone.querySelector('tbody');
+                        for (const [subCat, parts] of Object.entries(subCats)) {
+                            let trSubCat = subCateglineClone.cloneNode(true);
+
+                            trSubCat.querySelector('.juge-sub-categ').innerText = cat + subCat;
+                            tbody.appendChild(trSubCat);
+
+                            for (let i = 0; i < parts.length; i++) {
+                                let tr = lineClone.cloneNode(true);
+
+                                tr.querySelector('.nom').innerText = parts[i].nom;
+                                tr.querySelector('.prenom').innerText = parts[i].prenom;
+                                tr.querySelector('.dossard').innerText = parts[i].dossard;
+
+                                tbody.appendChild(tr);
+                            }
+                        }
+
+                        document.body.appendChild(clone);
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
